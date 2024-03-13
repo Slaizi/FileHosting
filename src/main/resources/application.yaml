@@ -11,3 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+minio:
+  url: ${MINIO_URL}
+  username: ${MINIO_USERNAME}
+  password: ${MINIO_SECRET_KEY}

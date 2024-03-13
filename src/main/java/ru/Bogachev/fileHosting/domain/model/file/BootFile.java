@@ -1,4 +1,4 @@
-package ru.Bogachev.fileHosting.domain.model;
+package ru.Bogachev.fileHosting.domain.model.file;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
