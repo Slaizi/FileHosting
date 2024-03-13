@@ -8,5 +8,5 @@
     <suppress checks="DesignForExtension"/>
     <suppress checks="HideUtilityClassConstructor"/>
     <suppress checks="MagicNumber"/>
-    <suppress checks="HiddenField"/>
+    <suppress checks="AvoidStarImport"/>
 </suppressions>

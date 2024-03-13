@@ -1,4 +1,4 @@
-package ru.Bogachev.fileHosting.domain.model;
+package ru.Bogachev.fileHosting.domain.model.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import ru.Bogachev.fileHosting.domain.model.file.BootFile;
 
 import java.util.List;
 import java.util.Set;

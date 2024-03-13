@@ -1,6 +1,6 @@
 package ru.Bogachev.fileHosting.service;
 
-import ru.Bogachev.fileHosting.domain.model.User;
+import ru.Bogachev.fileHosting.domain.model.user.User;
 
 public interface UserService {
 
