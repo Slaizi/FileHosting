@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  file-hosting:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+
+services:
+  postgres:
+    image: 'postgres:15.1-alpine'
+    container_name: FH-DB
+    ports:
+      - "5435:5432"
+    env_file:
+      - .env
+    networks:
+      - file-hosting
+    volumes:
+      - db-data:/var/lid/postgresql/data
