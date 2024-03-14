@@ -30,7 +30,7 @@ public class User {
     @Transient
     private String passwordConformation;
 
-    @CollectionTable(name = "user_roles")
+    @CollectionTable(name = "users_roles")
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
