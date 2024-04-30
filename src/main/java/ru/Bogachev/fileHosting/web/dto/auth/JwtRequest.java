@@ -1,15 +1,15 @@
 package ru.Bogachev.fileHosting.web.dto.auth;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class JwtRequest {
 
-    @NotNull(message = "Username cannot be null.")
+    @NotBlank(message = "Username cannot be null.")
     private String username;
 
-    @NotNull(message = "Password cannot be null.")
+    @NotBlank(message = "Password cannot be null.")
     private String password;
 
 }

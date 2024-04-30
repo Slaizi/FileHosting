@@ -19,7 +19,6 @@ import ru.Bogachev.fileHosting.service.props.JwtProps;
 import ru.Bogachev.fileHosting.web.dto.auth.JwtResponse;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -31,7 +30,7 @@ public class JwtTokenProvider implements TokenProvider {
     private final JwtProps jwtProps;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
-    private Key key;
+    private SecretKey key;
 
     @PostConstruct
     public void init() {
@@ -78,20 +77,20 @@ public class JwtTokenProvider implements TokenProvider {
         if (!validateToken(refreshToken)) {
             throw new AccessDeniedException();
         }
-        UUID id = getIdFromToken(refreshToken);
+        UUID id = UUID.fromString(getIdFromToken(refreshToken));
         User user = userService.getById(id);
-        return JwtResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .accessToken(createAccessToken(user))
-                .refreshToken(createRefreshToken(user))
-                .build();
+        return new JwtResponse(
+                user.getId(),
+                user.getUsername(),
+                createAccessToken(user),
+                createRefreshToken(user)
+        );
     }
 
     @Override
-    public Boolean validateToken(final String token) {
+    public boolean validateToken(final String token) {
         Jws<Claims> claims = Jwts.parser()
-                .verifyWith((SecretKey) key)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token);
         return !claims.getPayload().getExpiration().before(new Date());
@@ -117,16 +116,17 @@ public class JwtTokenProvider implements TokenProvider {
                 .toList();
     }
 
-    private UUID getIdFromToken(final String token) {
+    private String getIdFromToken(final String token) {
         Jws<Claims> claims = Jwts.parser()
-                .verifyWith((SecretKey) key)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token);
-        return (UUID) claims.getPayload().get("id");
+        return claims.getPayload().get("id").toString();
     }
+
     private String getUsernameFromToken(final String token) {
         return Jwts.parser()
-                .verifyWith((SecretKey) key)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

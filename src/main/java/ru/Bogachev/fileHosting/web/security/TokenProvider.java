@@ -11,7 +11,7 @@ public interface TokenProvider {
 
     JwtResponse refreshUserTokens(String refreshToken);
 
-    Boolean validateToken(String token);
+    boolean validateToken(String token);
 
     Authentication getAuthentication(String token);
 
