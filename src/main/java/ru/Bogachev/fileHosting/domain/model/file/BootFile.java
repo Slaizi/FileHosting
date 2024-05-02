@@ -23,6 +23,9 @@ public class BootFile {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
+    @Transient
+    private String link;
+
     @Column(name = "server_name")
     private String serverName;
 

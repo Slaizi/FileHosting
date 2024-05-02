@@ -1,6 +1,12 @@
 package ru.Bogachev.fileHosting.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,13 +26,21 @@ import ru.Bogachev.fileHosting.web.mappers.UserMapper;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Auth Controller", description = "Auth API")
 public class AuthController {
 
     private final UserMapper userMapper;
     private final UserService userService;
     private final AuthService authService;
 
+    @Operation(summary = "User Login")
     @PostMapping(value = "/login")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = JwtResponse.class)
+            )
+    )
     public JwtResponse login(
             @RequestBody
             @Validated final JwtRequest jwtRequest
@@ -34,15 +48,30 @@ public class AuthController {
         return authService.login(jwtRequest);
     }
 
+    @Operation(summary = "We receive updated tokens")
     @PostMapping(value = "/refresh")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = JwtResponse.class)
+            )
+    )
     public JwtResponse refresh(
             @RequestBody
             @Validated final JwtRefresh request
+
     ) {
         return authService.refresh(request.getRefreshToken());
     }
 
+    @Operation(summary = "User registration")
     @PostMapping(value = "/register")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = UserDto.class)
+            )
+    )
     public UserDto registration(
             @RequestBody
             @Validated(OnCreate.class) final UserDto dto

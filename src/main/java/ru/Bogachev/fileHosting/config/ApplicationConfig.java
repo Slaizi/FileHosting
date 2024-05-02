@@ -1,6 +1,12 @@
 package ru.Bogachev.fileHosting.config;
 
 import io.minio.MinioClient;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +61,29 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement()
+                        .addList("bearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
+                )
+                .info(new Info()
+                        .title("File hosting API")
+                        .contact(new Contact()
+                                .name("Bogachev Konstantin")
+                                .email("bogachev_konstantin@bk.ru")
+                                .url("https://github.com/Slaizi"))
+                        .version("1.0")
+                );
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http)
             throws Exception {
         http
@@ -85,6 +114,10 @@ public class ApplicationConfig {
                 )
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/v1/auth/**")
+                                .permitAll()
+                                .requestMatchers("/swagger-ui/**")
+                                .permitAll()
+                                .requestMatchers("/v3/api-docs/**")
                                 .permitAll()
                                 .anyRequest().authenticated()
                 )
