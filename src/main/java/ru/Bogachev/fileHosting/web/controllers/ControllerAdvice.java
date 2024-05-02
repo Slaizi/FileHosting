@@ -8,9 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.Bogachev.fileHosting.domain.exception.AccessDeniedException;
-import ru.Bogachev.fileHosting.domain.exception.ExceptionBody;
-import ru.Bogachev.fileHosting.domain.exception.UserNotFoundException;
+import ru.Bogachev.fileHosting.domain.exception.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +20,46 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionBody handleMethodIllegalState(
             final IllegalStateException e
+    ) {
+        return new ExceptionBody(e.getMessage());
+    }
+
+    @ExceptionHandler(MinioCreateBucketException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionBody handleFileDownload(
+            final MinioCreateBucketException e
+    ) {
+        return new ExceptionBody(e.getMessage());
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionBody handleFileDownload(
+            final FileNotFoundException e
+    ) {
+        return new ExceptionBody(e.getMessage());
+    }
+
+    @ExceptionHandler(FileDownloadException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionBody handleFileDownload(
+            final FileDownloadException e
+    ) {
+        return new ExceptionBody(e.getMessage());
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionBody handleFileDownload(
+            final FileUploadException e
+    ) {
+        return new ExceptionBody(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionBody handleMethodIllegalState(
+            final IllegalArgumentException e
     ) {
         return new ExceptionBody(e.getMessage());
     }

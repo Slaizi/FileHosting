@@ -11,4 +11,6 @@ public interface UserService {
     User getById(UUID id);
 
     User getByUsername(String username);
+
+    boolean isFileOwner(UUID userId, String serverName);
 }
