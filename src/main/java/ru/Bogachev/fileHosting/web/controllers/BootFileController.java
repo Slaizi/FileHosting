@@ -1,8 +1,13 @@
 package ru.Bogachev.fileHosting.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -20,52 +25,67 @@ import ru.Bogachev.fileHosting.web.mappers.BootFileMapper;
 import ru.Bogachev.fileHosting.web.security.JwtEntity;
 
 import java.io.InputStream;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/file")
 @RequiredArgsConstructor
+@Tag(name = "Boot file Controller",
+        description = "Controller for working with files")
 public class BootFileController {
+
     private final BootFileService bootFileService;
     private final BootFileMapper bootFileMapper;
 
-    @PostMapping(value = "/upload")
-    public ResponseEntity<Map<String, BootFileDto>> uploadFile(
+
+    @Operation(summary = "Uploading a file")
+    @PostMapping(value = "/upload",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiResponse(
+            responseCode = "200",
+            description = "File link and description",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = BootFileDto.class)
+            )
+    )
+    public ResponseEntity<BootFileDto> uploadFile(
             @AuthenticationPrincipal final JwtEntity entity,
-            @RequestParam(name = "file") final MultipartFile file
+            @RequestPart(name = "file") final MultipartFile file
     ) {
-        if (file == null && file.isEmpty()
-            && StringUtils.isBlank(file.getOriginalFilename())
-        ) {
+        if (file == null) {
             throw new IllegalArgumentException(
                     "File must not be empty or null."
             );
         }
-        Map<String, BootFile> upload = bootFileService.upload(
+        BootFile btFile = bootFileService.upload(
                 entity.getId(), file);
-        if (upload.isEmpty()) {
+        if (btFile == null) {
             throw new IllegalArgumentException(
                     "The file was not uploaded."
             );
         }
-        return ResponseEntity.ok(
-                upload.entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> bootFileMapper.toDto(entry.getValue())
-                        ))
-        );
+        return ResponseEntity.ok(bootFileMapper.toDto(btFile));
     }
 
+    @Operation(summary = "Download file")
     @GetMapping(value = "/download/{serverName}")
     @PreAuthorize(
             "@securityExpression.canAccessUserFromFile(#entity.id, #serverName)"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "File content",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            )
+    )
     public ResponseEntity<Resource> downloadFile(
             @AuthenticationPrincipal final JwtEntity entity,
-            @PathVariable(name = "serverName") final String serverName,
+            @PathVariable(name = "serverName")
+            @Parameter(
+                    description = "Server file name",
+                    required = true
+            ) final String serverName,
             final HttpServletResponse response
     ) {
         if (serverName == null) {
@@ -75,9 +95,9 @@ public class BootFileController {
         }
         BootFile btFile = bootFileService.getByServerName(serverName);
         InputStream inputStream = bootFileService.download(serverName);
-
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=" + btFile.getOriginalName()
+                "attachment; filename=" + String.join(".",
+                        btFile.getOriginalName(), btFile.getFileType())
         );
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
