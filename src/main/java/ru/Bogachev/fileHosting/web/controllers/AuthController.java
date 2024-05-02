@@ -36,9 +36,10 @@ public class AuthController {
 
     @PostMapping(value = "/refresh")
     public JwtResponse refresh(
-            @RequestBody final JwtRefresh request
+            @RequestBody
+            @Validated final JwtRefresh request
     ) {
-        return authService.refresh(request.refreshToken());
+        return authService.refresh(request.getRefreshToken());
     }
 
     @PostMapping(value = "/register")
