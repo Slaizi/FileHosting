@@ -42,7 +42,6 @@ public class BootFileServiceImpl implements BootFileService {
                 DOWNLOAD_FILE_LINK,
                 serverName);
 
-        minioService.save(file, serverName, fileType);
 
         BootFile bootFile = BootFile.builder()
                 .originalName(getOriginalName(
@@ -53,8 +52,10 @@ public class BootFileServiceImpl implements BootFileService {
                 .fileType(fileType)
                 .dateTime(LocalDateTime.now())
                 .build();
+
         bootFileRepository.save(bootFile);
         bootFileRepository.assignBootFile(userId, bootFile.getId());
+        minioService.save(file, serverName, fileType);
 
         return bootFile;
     }
@@ -86,8 +87,11 @@ public class BootFileServiceImpl implements BootFileService {
         return Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf(".") + 1);
     }
+
     private String getOriginalName(final String fullFileName) {
-        String originalName = fullFileName.substring(0, fullFileName.lastIndexOf("."));
+        String originalName = fullFileName.substring(0,
+                fullFileName.lastIndexOf(".")
+        );
         if (originalName.isEmpty()) {
             throw new FileUploadException(
                     "Filename cannot be empty."

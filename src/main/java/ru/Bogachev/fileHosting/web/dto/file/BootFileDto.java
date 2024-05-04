@@ -1,7 +1,9 @@
 package ru.Bogachev.fileHosting.web.dto.file;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -34,5 +36,7 @@ public class BootFileDto {
             description = "date of download",
             accessMode = Schema.AccessMode.READ_ONLY
     )
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @JsonFormat(pattern = "HH:mm:ss - dd:MM:yyyy ")
     private LocalDateTime dateTime;
 }

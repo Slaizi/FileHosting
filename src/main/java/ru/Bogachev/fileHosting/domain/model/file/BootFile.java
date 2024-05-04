@@ -26,7 +26,7 @@ public class BootFile {
     @Transient
     private String link;
 
-    @Column(name = "server_name")
+    @Column(name = "server_name", unique = true)
     private String serverName;
 
     @Column(name = "original_name")

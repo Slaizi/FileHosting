@@ -24,6 +24,7 @@ public class User {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
+    @Column(name = "username", unique = true)
     private String username;
     private String password;
 
@@ -37,7 +38,7 @@ public class User {
     private Set<Role> roles;
 
     @CollectionTable(name = "users_files")
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "file_id")
     private List<BootFile> files;
 }

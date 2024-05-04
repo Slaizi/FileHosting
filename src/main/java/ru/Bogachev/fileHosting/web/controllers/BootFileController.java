@@ -70,7 +70,7 @@ public class BootFileController {
     @Operation(summary = "Download file")
     @GetMapping(value = "/download/{serverName}")
     @PreAuthorize(
-            "@securityExpression.canAccessUserFromFile(#entity.id, #serverName)"
+            "@securityExpression.canAccessUserFromFile(#serverName)"
     )
     @ApiResponse(
             responseCode = "200",
@@ -80,12 +80,12 @@ public class BootFileController {
             )
     )
     public ResponseEntity<Resource> downloadFile(
-            @AuthenticationPrincipal final JwtEntity entity,
             @PathVariable(name = "serverName")
             @Parameter(
                     description = "Server file name",
                     required = true
-            ) final String serverName,
+            )
+            final String serverName,
             final HttpServletResponse response
     ) {
         if (serverName == null) {
