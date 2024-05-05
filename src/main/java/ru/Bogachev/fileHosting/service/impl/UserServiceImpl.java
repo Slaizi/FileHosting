@@ -10,6 +10,7 @@ import ru.Bogachev.fileHosting.domain.model.user.User;
 import ru.Bogachev.fileHosting.repository.UserRepository;
 import ru.Bogachev.fileHosting.service.UserService;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,20 +24,27 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User create(final User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new IllegalStateException(
-                    "User already exist."
-            );
+        checkIfUserExistsOrThrow(user);
+
+        if (passwordValid(user)) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        if (!user.getPassword().equals(user.getPasswordConformation())) {
-            throw new IllegalStateException(
-                    "Password and password confirmation do not match."
-            );
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of(Role.ROLE_USER));
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public User update(final User user) {
+        User userFromDb = getById(user.getId());
+        if (!userFromDb.getUsername().equals(user.getUsername())) {
+            checkIfUserExistsOrThrow(user);
+            userFromDb.setUsername(user.getUsername());
+        }
+        if (passwordValid(user)) {
+            userFromDb.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        return userRepository.save(userFromDb);
     }
 
     @Override
@@ -46,6 +54,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format("User with %s not found", id)
                 ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -62,5 +76,22 @@ public class UserServiceImpl implements UserService {
     public boolean isFileOwner(final UUID userId,
                                final String serverName) {
         return userRepository.isFileOwner(userId.toString(), serverName);
+    }
+
+    private void checkIfUserExistsOrThrow(final User user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new IllegalStateException(
+                    "User '%s' already exists.".formatted(user.getUsername())
+            );
+        }
+    }
+
+    private boolean passwordValid(final User user) {
+        if (!user.getPassword().equals(user.getPasswordConformation())) {
+            throw new IllegalStateException(
+                    "Password and password confirmation do not match."
+            );
+        }
+        return true;
     }
 }

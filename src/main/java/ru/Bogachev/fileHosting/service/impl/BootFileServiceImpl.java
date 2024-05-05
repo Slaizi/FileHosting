@@ -14,6 +14,7 @@ import ru.Bogachev.fileHosting.service.MinioService;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -54,7 +55,10 @@ public class BootFileServiceImpl implements BootFileService {
                 .build();
 
         bootFileRepository.save(bootFile);
-        bootFileRepository.assignBootFile(userId, bootFile.getId());
+        bootFileRepository.assignBootFile(
+                userId.toString(),
+                bootFile.getId().toString()
+        );
         minioService.save(file, serverName, fileType);
 
         return bootFile;
@@ -67,6 +71,24 @@ public class BootFileServiceImpl implements BootFileService {
                 .orElseThrow(() -> new FileNotFoundException(
                         String.format("File named %s not found.", serverName)
                 ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BootFile> getAllUserFiles(final UUID userId) {
+        List<BootFile> files = bootFileRepository.findAllByUserId(
+                userId.toString()
+        );
+        if (files.isEmpty()) {
+            throw new FileNotFoundException(
+                    "File list is empty."
+            );
+        }
+        files.forEach(e -> e.setLink(String.format(
+                        DOWNLOAD_FILE_LINK, e.getServerName())
+                )
+        );
+        return files;
     }
 
     @Override

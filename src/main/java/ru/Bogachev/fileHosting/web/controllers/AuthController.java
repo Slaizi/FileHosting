@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,11 +42,11 @@ public class AuthController {
                     schema = @Schema(implementation = JwtResponse.class)
             )
     )
-    public JwtResponse login(
+    public ResponseEntity<JwtResponse> login(
             @RequestBody
             @Validated final JwtRequest jwtRequest
     ) {
-        return authService.login(jwtRequest);
+        return ResponseEntity.ok(authService.login(jwtRequest));
     }
 
     @Operation(summary = "We receive updated tokens")
@@ -56,12 +57,14 @@ public class AuthController {
                     schema = @Schema(implementation = JwtResponse.class)
             )
     )
-    public JwtResponse refresh(
+    public ResponseEntity<JwtResponse> refresh(
             @RequestBody
             @Validated final JwtRefresh request
 
     ) {
-        return authService.refresh(request.getRefreshToken());
+        return ResponseEntity.ok(authService.refresh(
+                request.getRefreshToken())
+        );
     }
 
     @Operation(summary = "User registration")
@@ -72,12 +75,12 @@ public class AuthController {
                     schema = @Schema(implementation = UserDto.class)
             )
     )
-    public UserDto registration(
+    public ResponseEntity<UserDto> registration(
             @RequestBody
             @Validated(OnCreate.class) final UserDto dto
     ) {
         User user = userMapper.toEntity(dto);
         User createdUser = userService.create(user);
-        return userMapper.toDto(createdUser);
+        return ResponseEntity.ok(userMapper.toDto(createdUser));
     }
 }

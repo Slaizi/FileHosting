@@ -2,6 +2,7 @@ package ru.Bogachev.fileHosting.web.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +26,7 @@ import ru.Bogachev.fileHosting.web.mappers.BootFileMapper;
 import ru.Bogachev.fileHosting.web.security.JwtEntity;
 
 import java.io.InputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/file")
@@ -42,7 +44,6 @@ public class BootFileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponse(
             responseCode = "200",
-            description = "File link and description",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = BootFileDto.class)
@@ -84,8 +85,7 @@ public class BootFileController {
             @Parameter(
                     description = "Server file name",
                     required = true
-            )
-            final String serverName,
+            ) final String serverName,
             final HttpServletResponse response
     ) {
         if (serverName == null) {
@@ -103,5 +103,26 @@ public class BootFileController {
 
         return new ResponseEntity<>(new InputStreamResource(inputStream),
                 HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get list of all user files")
+    @GetMapping(value = "/all")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(
+                            schema = @Schema(
+                                    implementation = BootFileDto.class
+                            )
+                    )
+            )
+    )
+    public ResponseEntity<List<BootFileDto>> getAllUserFiles(
+            @AuthenticationPrincipal final JwtEntity entity
+    ) {
+        List<BootFile> files = bootFileService
+                .getAllUserFiles(entity.getId());
+        return ResponseEntity.ok(bootFileMapper.toDto(files));
     }
 }

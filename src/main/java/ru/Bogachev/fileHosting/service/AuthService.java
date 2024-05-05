@@ -5,5 +5,6 @@ import ru.Bogachev.fileHosting.web.dto.auth.JwtResponse;
 
 public interface AuthService {
     JwtResponse login(JwtRequest request);
+
     JwtResponse refresh(String refreshToken);
 }

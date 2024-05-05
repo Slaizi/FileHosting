@@ -37,6 +37,6 @@ public class BootFileDto {
             accessMode = Schema.AccessMode.READ_ONLY
     )
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-    @JsonFormat(pattern = "HH:mm:ss - dd:MM:yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss - dd.MM.yyyy ")
     private LocalDateTime dateTime;
 }

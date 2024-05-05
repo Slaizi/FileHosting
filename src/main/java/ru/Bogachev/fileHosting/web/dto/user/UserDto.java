@@ -15,7 +15,10 @@ import java.util.UUID;
 @Schema(description = "User DTO")
 public class UserDto {
 
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(
+            description = "id",
+            example = "b16558d8-f3bf-4c81-8b87-feea237717ec"
+    )
     @NotNull(
             message = "Id must be not null.",
             groups = {OnUpdate.class}
@@ -55,7 +58,7 @@ public class UserDto {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(
             message = "Password confirmation must be not null.",
-            groups = {OnCreate.class}
+            groups = {OnCreate.class, OnUpdate.class}
     )
     private String passwordConformation;
 

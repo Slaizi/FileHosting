@@ -17,6 +17,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+
     @Override
     public JwtResponse login(final JwtRequest request) {
         authenticationManager.authenticate(
