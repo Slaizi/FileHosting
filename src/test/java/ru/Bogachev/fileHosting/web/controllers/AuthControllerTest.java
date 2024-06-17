@@ -24,6 +24,8 @@ import ru.Bogachev.fileHosting.web.dto.auth.JwtRequest;
 import ru.Bogachev.fileHosting.web.dto.user.UserDto;
 import ru.Bogachev.fileHosting.web.security.TokenProvider;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -90,7 +92,7 @@ class AuthControllerTest {
     void badCredentialsLoginTest() {
         JwtRequest request = new JwtRequest();
         request.setUsername("test");
-        request.setPassword("asd");
+        request.setPassword("password");
 
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/api/v1/auth/login")
@@ -192,8 +194,8 @@ class AuthControllerTest {
     void badCredentialsRegistrationTestUserAlreadyExists() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("username", "test");
-        jsonObject.put("password", "213sa");
-        jsonObject.put("passwordConformation", "124a");
+        jsonObject.put("password", "password");
+        jsonObject.put("passwordConformation", "password");
 
         String json = jsonObject.toString();
 
@@ -208,10 +210,11 @@ class AuthControllerTest {
     @Test
     @SneakyThrows
     void badCredentialsRegistrationTestPasswordDoNotMatch() {
+        String username = UUID.randomUUID().toString().substring(0, 4);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("username", "fdhmdfhdjnvcx");
-        jsonObject.put("password", "213sa");
-        jsonObject.put("passwordConformation", "124a");
+        jsonObject.put("username", username);
+        jsonObject.put("password", "password");
+        jsonObject.put("passwordConformation", "passwordConformation");
 
         String json = jsonObject.toString();
 
