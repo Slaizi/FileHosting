@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -68,9 +69,9 @@ public class AuthController {
     }
 
     @Operation(summary = "User registration")
-    @PostMapping(value = "/register")
+    @PostMapping(value = "/registration")
     @ApiResponse(
-            responseCode = "200",
+            responseCode = "201",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = UserDto.class)
             )
@@ -81,6 +82,7 @@ public class AuthController {
     ) {
         User user = userMapper.toEntity(dto);
         User createdUser = userService.create(user);
-        return ResponseEntity.ok(userMapper.toDto(createdUser));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userMapper.toDto(createdUser));
     }
 }

@@ -14,5 +14,5 @@ public interface BootFileService {
 
     List<BootFile> getAllUserFiles(UUID userId);
 
-    InputStream download(String serverName);
+    InputStream download(String serverName, BootFile file);
 }

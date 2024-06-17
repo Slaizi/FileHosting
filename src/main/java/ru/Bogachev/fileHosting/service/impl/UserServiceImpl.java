@@ -26,9 +26,12 @@ public class UserServiceImpl implements UserService {
     public User create(final User user) {
         checkIfUserExistsOrThrow(user);
 
-        if (passwordValid(user)) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (!passwordValid(user)) {
+            throw new IllegalStateException(
+                    "Password and password confirmation do not match."
+            );
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of(Role.ROLE_USER));
         return userRepository.save(user);
     }
@@ -36,24 +39,24 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User update(final User user) {
-        User userFromDb = getById(user.getId());
+        User userFromDb = findUserById(user.getId());
         if (!userFromDb.getUsername().equals(user.getUsername())) {
             checkIfUserExistsOrThrow(user);
             userFromDb.setUsername(user.getUsername());
         }
-        if (passwordValid(user)) {
-            userFromDb.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (!passwordValid(user)) {
+            throw new IllegalStateException(
+                    "Password and password confirmation do not match."
+            );
         }
+        userFromDb.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(userFromDb);
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getById(final UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format("User with %s not found", id)
-                ));
+        return findUserById(id);
     }
 
     @Override
@@ -87,11 +90,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean passwordValid(final User user) {
-        if (!user.getPassword().equals(user.getPasswordConformation())) {
-            throw new IllegalStateException(
-                    "Password and password confirmation do not match."
-            );
-        }
-        return true;
+        return user.getPassword().equals(user.getPasswordConformation());
+    }
+
+    private User findUserById(final UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("User with %s not found", id)
+                ));
     }
 }

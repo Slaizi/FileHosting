@@ -94,7 +94,7 @@ public class BootFileController {
             );
         }
         BootFile btFile = bootFileService.getByServerName(serverName);
-        InputStream inputStream = bootFileService.download(serverName);
+        InputStream inputStream = bootFileService.download(serverName, btFile);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=" + String.join(".",
                         btFile.getOriginalName(), btFile.getFileType())
