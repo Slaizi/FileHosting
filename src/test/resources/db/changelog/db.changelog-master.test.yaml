@@ -1,7 +1,7 @@
 databaseChangeLog:
   - include:
-      file: /changesets/V1__init.sql
+      file: db.changelog-master.yaml
       relativeToChangelogFile: true
   - include:
-      file: /changesets/V2__insert_data.sql
+      file: /changesets/V3__insert_test_data.sql
       relativeToChangelogFile: true

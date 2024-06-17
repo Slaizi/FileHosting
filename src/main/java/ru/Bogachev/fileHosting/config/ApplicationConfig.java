@@ -109,7 +109,7 @@ public class ApplicationConfig {
                                             HttpStatus.FORBIDDEN.value()
                                     );
                                     response.getWriter()
-                                            .write("Unauthorized.");
+                                            .write("Forbidden.");
                                 })
                 )
                 .authorizeHttpRequests(request ->

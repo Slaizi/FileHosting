@@ -69,7 +69,7 @@ public class BootFileServiceImpl implements BootFileService {
     public BootFile getByServerName(final String serverName) {
         return bootFileRepository.findByServerName(serverName)
                 .orElseThrow(() -> new FileNotFoundException(
-                        String.format("File named %s not found.", serverName)
+                        String.format("File named '%s' not found.", serverName)
                 ));
     }
 
@@ -92,8 +92,7 @@ public class BootFileServiceImpl implements BootFileService {
     }
 
     @Override
-    public InputStream download(final String serverName) {
-        BootFile file = getByServerName(serverName);
+    public InputStream download(final String serverName, final BootFile file) {
         return minioService.downloadFile(serverName, file.getFileType());
     }
 
@@ -106,8 +105,11 @@ public class BootFileServiceImpl implements BootFileService {
     }
 
     private String getExtension(final MultipartFile file) {
-        return Objects.requireNonNull(file.getOriginalFilename())
-                .substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new IllegalArgumentException("Invalid file: No extension found");
+        }
+        return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
     }
 
     private String getOriginalName(final String fullFileName) {

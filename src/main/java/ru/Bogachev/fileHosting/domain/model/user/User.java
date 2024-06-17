@@ -37,8 +37,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @CollectionTable(name = "users_files")
+
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id")
+    @JoinTable(
+            name = "users_files",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_id")
+    )
     private List<BootFile> files;
 }
